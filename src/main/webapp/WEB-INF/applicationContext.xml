@@ -10,4 +10,5 @@
    <import resource="applicationContext-security.xml" />
   <import resource="activiti-standalone-context.xml" />
   <import resource="activiti-ui-context.xml" />
+   <import resource="applicationContext-rpc.xml" />
 </beans>

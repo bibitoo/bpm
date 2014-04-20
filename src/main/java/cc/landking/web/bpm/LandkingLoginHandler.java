@@ -18,43 +18,52 @@ import org.activiti.explorer.ui.login.LoginHandler;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import cc.landking.web.bpm.identity.LandkingUserIdentityManager;
+
 public class LandkingLoginHandler extends DefaultLoginHandler implements
 		LoginHandler {
 
-	  protected transient IdentityService identityService;
+	  protected transient LandkingUserIdentityManager landkingUserIdentityManager;
 
-	  public LoggedInUserImpl authenticate(String userName, String password) {
+
+
+	public void setLandkingUserIdentityManager(
+			LandkingUserIdentityManager landkingUserIdentityManager) {
+		this.landkingUserIdentityManager = landkingUserIdentityManager;
+	}
+
+	public LoggedInUserImpl authenticate(String userName, String password) {
 	    LoggedInUserImpl loggedInUser = null;
-	    if (identityService.checkPassword(userName, password)) {
-	      User user = identityService.createUserQuery().userId(userName).singleResult();
-	      // Fetch and cache user data
-	      loggedInUser = new LoggedInUserImpl(user, password);
-	      List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
-	      for (Group group : groups) {
-
-	        if (Constants.SECURITY_ROLE.equals(group.getType())) {
-	          loggedInUser.addSecurityRoleGroup(group);
-	          if (Constants.SECURITY_ROLE_USER.equals(group.getId())) {
-	            loggedInUser.setUser(true);
-	          }
-	          if (Constants.SECURITY_ROLE_ADMIN.equals(group.getId())) {
-	            loggedInUser.setAdmin(true);
-	          }
-	        } else if (ExplorerApp.get().getAdminGroups() != null
-	                    && ExplorerApp.get().getAdminGroups().contains(group.getId())) {
-	          loggedInUser.addSecurityRoleGroup(group);
-	          loggedInUser.setAdmin(true);
-	        } else if (ExplorerApp.get().getUserGroups() != null
-	                && ExplorerApp.get().getUserGroups().contains(group.getId())) {
-	          loggedInUser.addSecurityRoleGroup(group);
-	          loggedInUser.setUser(true);
-	        } else {
-	          loggedInUser.addGroup(group);
-	        }
-	        
-	        
-	      }
-	    }
+//	    if (identityService.checkPassword(userName, password)) {
+//	      User user = identityService.createUserQuery().userId(userName).singleResult();
+//	      // Fetch and cache user data
+//	      loggedInUser = new LoggedInUserImpl(user, password);
+//	      List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
+//	      for (Group group : groups) {
+//
+//	        if (Constants.SECURITY_ROLE.equals(group.getType())) {
+//	          loggedInUser.addSecurityRoleGroup(group);
+//	          if (Constants.SECURITY_ROLE_USER.equals(group.getId())) {
+//	            loggedInUser.setUser(true);
+//	          }
+//	          if (Constants.SECURITY_ROLE_ADMIN.equals(group.getId())) {
+//	            loggedInUser.setAdmin(true);
+//	          }
+//	        } else if (ExplorerApp.get().getAdminGroups() != null
+//	                    && ExplorerApp.get().getAdminGroups().contains(group.getId())) {
+//	          loggedInUser.addSecurityRoleGroup(group);
+//	          loggedInUser.setAdmin(true);
+//	        } else if (ExplorerApp.get().getUserGroups() != null
+//	                && ExplorerApp.get().getUserGroups().contains(group.getId())) {
+//	          loggedInUser.addSecurityRoleGroup(group);
+//	          loggedInUser.setUser(true);
+//	        } else {
+//	          loggedInUser.addGroup(group);
+//	        }
+//	        
+//	        
+//	      }
+//	    }
 	    
 	    return loggedInUser;
 	  }
@@ -75,11 +84,11 @@ public class LandkingLoginHandler extends DefaultLoginHandler implements
 		  if(securityObject instanceof UserDetails){
 			  UserDetails userDetails = (UserDetails) securityObject;
 
-		      User user = identityService.createUserQuery().userId(userDetails.getUsername()).singleResult();
+		      User user = landkingUserIdentityManager.findUserById(userDetails.getUsername());
 			    if (user != null) {
 		      // Fetch and cache user data
 		      loggedInUser = new LoggedInUserImpl(user, userDetails.getPassword());
-		      List<Group> groups = identityService.createGroupQuery().groupMember(user.getId()).list();
+		      List<Group> groups =landkingUserIdentityManager.findGroupsByUser(userDetails.getUsername());
 		      for (Group group : groups) {
 
 		        if (Constants.SECURITY_ROLE.equals(group.getType())) {
@@ -114,7 +123,5 @@ public class LandkingLoginHandler extends DefaultLoginHandler implements
 	    Authentication.setAuthenticatedUserId(null);
 	  }
 	  
-	  public void setIdentityService(IdentityService identityService) {
-	    this.identityService = identityService;
-	  }
+
 }

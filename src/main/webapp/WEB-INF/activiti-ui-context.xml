@@ -93,7 +93,7 @@
     <property name="logoutURL" value="${sso.logoutUrl}"/>
   </bean>
   <bean id="activitiLandkingLoginHandler" class="cc.landking.web.bpm.LandkingLoginHandler">
-    <property name="identityService" ref="identityService" />
+    <property name="landkingUserIdentityManager" ref="landkingUserIdentityManager" />
   </bean>
   
   <bean id="simpleWorkflowJsonConverter" class="org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter" />
