@@ -83,7 +83,7 @@ public class LandkingUserIdentityManager extends UserEntityManager implements Us
 			OrganizationData odata = organizationSpiService.getById(org);
 			GroupEntity group = new GroupEntity(odata.getId());
 			group.setName(odata.getName());
-			group.setType(odata.getOrgType());
+			group.setType(Constants.SECURITY_ROLE_USER);
 			groups.add(group);
 		}
 		if(user.isAdmin() || user.getLoginName().equals("admin")){
